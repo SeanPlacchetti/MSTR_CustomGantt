@@ -41,6 +41,7 @@ else{
 
 this.setDefaultPropertyValues({ //set default props for custom props
 		showChangeDate: 'false',
+		showRowLabelHgt: 'false',
 		showDateLine: 'true',
 		showLabels: 'true',
 		showDateLabels: 'true',
@@ -50,7 +51,10 @@ this.setDefaultPropertyValues({ //set default props for custom props
 		showFYQtrAxis: 'false',
 		dateLine: "",
 		tooltipFontSize: "16px",
-		showYAxisTitle: 'true'
+		showYAxisTitle: 'true',
+		catLabelHgt: '2',
+		barMarginHeight: '10',
+		rotateXAxisLabels: 'false'
 });
 
 //checks if there are existing children on the domNode, if so deletes them
@@ -78,6 +82,7 @@ document.getElementById(this.domNode.id).style.overflow = "auto"; //allow for sc
 //console.log(this.getProperty("showDateLine")); //used for debugging
 //console.log("Tool Tip Font Size: " + this.getProperty("tooltipFontSize")); //used for debugging
 
+//getting values and setting booleans from defaultProps
 var showDateLineBool = (this.getProperty('showDateLine') === 'true');
 var hideLabelBool = (this.getProperty('showLabels') === 'false');
 var hideDateLabelBool = (this.getProperty('showDateLabels') === 'false');
@@ -87,8 +92,10 @@ var hideFYAxisBool = (this.getProperty('showFYAxis') === 'false');
 var hideFYQtrAxisBool = (this.getProperty('showFYQtrAxis') === 'false');
 var tooltipSizeFromProps = this.getProperty("tooltipFontSize");
 var hideYAxisTitleBool = (this.getProperty('showYAxisTitle') === 'false');
-//debugger;
 var dateLineFromProp = this.getProperty('dateLine');
+var catLabelHgtInt = parseInt(this.getProperty('catLabelHgt'));
+var barMarginHeightInt = parseInt(this.getProperty('barMarginHeight'));
+var rotateXAxisLabelsBool = (this.getProperty('rotateXAxisLabels') === 'true');
 
 var validateDate = function(testdate) { //test for date format
     var date_regex = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/;
@@ -101,33 +108,44 @@ if(dateLineFromProp != "" && !validateDate(dateLineFromProp)){ //check if dateLi
 
 var xAxisCount = 0, cyQtrAxisCount = 0, fyQtrAxisCount = 0, fyAxisCount = 0;  //initialize variables
 
+var axisSpacing = 0; //value to determine xaxis spacing
+var bottomMarginValue = 140; //value to determine bottom margin value
+
+if(rotateXAxisLabelsBool){ //if the toggle for rotating xaxis is checked then set larger axis spacing and increase bottom margin so axes do not get clipped
+	axisSpacing = 65;
+	bottomMarginValue = 240;
+}
+else{ //else rotate axis toggle not checked, standard axis spacing and do not change bottom margin value from initial set value
+	axisSpacing = 30
+}
+
 /**
 * There is probably a more elegant way to code the boolean checks below, but I could not figure one out
 * Given not wanting to waste too much time on figuring it out, this works for now
 */
 var tallyAxisBools = function(){  //logic to adjust axis label heights based off show/hide scenarios
 	if(!hideCYAxisBool && !hideCYQtrAxisBool && !hideFYAxisBool && !hideFYQtrAxisBool)//show month axis, cyqtr axis, fyqtr axis, and fy axis
-		cyQtrAxisCount = 30, fyQtrAxisCount = 60, fyAxisCount = 90;
+		cyQtrAxisCount = axisSpacing, fyQtrAxisCount = axisSpacing*2, fyAxisCount = axisSpacing*3;
 	if(!hideCYAxisBool && !hideCYQtrAxisBool && hideFYAxisBool && hideFYQtrAxisBool)//show month axis, cyqtr axis
-		cyQtrAxisCount = 30;
+		cyQtrAxisCount = axisSpacing;
 	if(hideCYAxisBool && !hideCYQtrAxisBool && !hideFYAxisBool && !hideFYQtrAxisBool)//show cyqtr axis, fyqtr axis, fy axis
-		fyQtrAxisCount = 30, fyAxisCount = 60;
+		fyQtrAxisCount = axisSpacing, fyAxisCount = axisSpacing*2;
 	if(!hideCYAxisBool && hideFYQtrAxisBool && !hideCYQtrAxisBool && !hideFYAxisBool)//show month axis, cyqtr axis, fy axis
-		cyQtrAxisCount = 30, fyAxisCount = 60;
+		cyQtrAxisCount = axisSpacing, fyAxisCount = axisSpacing*2;
 	if(!hideCYAxisBool && !hideCYQtrAxisBool && hideFYAxisBool && !hideFYQtrAxisBool)//show month axis, cyqtr axis, fyqtr axis
-		cyQtrAxisCount = 30, fyQtrAxisCount = 60;
+		cyQtrAxisCount = axisSpacing, fyQtrAxisCount = axisSpacing*2;
 	if(!hideCYAxisBool && !hideFYAxisBool && hideCYQtrAxisBool && !hideFYQtrAxisBool)//show month axis, fy axis, fyqtr axis
-		fyQtrAxisCount = 30, fyAxisCount = 60;
+		fyQtrAxisCount = axisSpacing, fyAxisCount = axisSpacing*2;
 	if(hideCYAxisBool && hideFYAxisBool && !hideCYQtrAxisBool && !hideFYQtrAxisBool)//show cyqtr axis, fyqtr axis
-		fyQtrAxisCount = 30;
+		fyQtrAxisCount = axisSpacing;
 	if(hideCYAxisBool && hideCYQtrAxisBool && !hideFYAxisBool && !hideFYQtrAxisBool)//show fy axis, fyqtr axis
-		fyAxisCount = 30;
+		fyAxisCount = axisSpacing;
 	if(!hideCYAxisBool && hideCYQtrAxisBool && !hideFYAxisBool && hideFYQtrAxisBool)//show month axis, fy axis
-		fyAxisCount = 30;
+		fyAxisCount = axisSpacing;
 	if(!hideCYAxisBool && hideCYQtrAxisBool && hideFYAxisBool && !hideFYQtrAxisBool)// show month axis, fyqtr axis
-		fyQtrAxisCount = 30;
+		fyQtrAxisCount = axisSpacing;
 	if(hideCYAxisBool && hideFYQtrAxisBool && !hideFYAxisBool && !hideCYQtrAxisBool)// show fy axis, cyqtr axis
-		fyAxisCount = 30;
+		fyAxisCount = axisSpacing;
 	return xAxisCount, cyQtrAxisCount, fyQtrAxisCount, fyAxisCount;
 }
 
@@ -138,18 +156,33 @@ var me = this;
 //console.log(this.domNode);  //used for debugging
 
 var domNode = this.domNode; //assign domNode to a variable
-//console.log(domNode);  //used for debugging
+console.log(domNode);  //used for debugging
+
+var makeid = function ()
+{
+			var text = "";
+			var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+			for( var i=0; i < 5; i++ )
+				text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+			return text;
+		}
+		
+var absParent = "absParent" + makeid();
+		
+var tooltipID = "tooltip" + makeid();
 
 /*
 *The below adds a div to the domNode that is used for tooltip popup
 */
-d3.select(domNode).append("div")   
+/* d3.select(domNode).append("div")   
 .attr("id", "tooltip")
 .attr("class", "hidden")
 .append("p").append("strong").append("p")
-.append("span").attr("id", "value");
+.append("span").attr("id", "value"); */
 
-d3.select("#tooltip p").style("font-size", tooltipSizeFromProps);
+/* d3.select("#tooltip p").style("font-size", tooltipSizeFromProps); */
 
 var $DI = mstrmojo.models.template.DataInterface, //this sets the MSTR Data Interface object to a variable
 	dataModel = (new $DI(this.model.data)).getRawData($DI.ENUM_RAW_DATA_FORMAT.ROWS_ADV, {hasSelection: true, hasTitleName: true}); //this variable will hold all the data from the MSTR dataset
@@ -182,6 +215,21 @@ var getCategories = function getCategories(root){
 getCategories(dataModel); //get the categories from the dataModel
 //console.log(categories); //used for debugging
 
+/*
+*Javascript does not recognize two digit years (i.e. yy) correctly,
+*the below method checks the inputted date.  The year must be in the last place (i.e. dd/mm/yyyy or dd/mm/yy)
+* If the inputed date has a year with two digits the function corrects the 
+*/
+var yearCheck = function(date){
+	var dateObj = new Date(date);
+	var dateArr = date.split(/[/-]/);
+	if(dateArr[2].length === 2){
+		var fullYr = dateObj.getFullYear();
+		if(fullYr < 1950)
+			dateObj.setFullYear(fullYr + 100);
+	}
+	return dateObj;
+}
 
 /* 
 *Below function gets the individual tasks and milestones from the dataModel
@@ -192,23 +240,26 @@ var getTasksAndMilestones = function getTasksAndMilestones(root){
 		tskCount = 0;
 	for(var a = 0; a < root.length; a++){
 		if(root[a].headers[2].name === root[a].headers[3].name || root[a].headers[3].name === ""){ //if startDate = endDate or no endDate then its a milestone
+			var checkedDate = yearCheck(root[a].headers[2].name);
 			milestones[msCount] = {
 				id: "MS" + (msCount+1),
 				category: root[a].headers[0].name,
 				label: root[a].headers[1].name,
-				date: new Date(root[a].headers[2].name),
+				date: checkedDate, /* new Date(root[a].headers[2].name), //old way to get date */
 				selection: root[a].headers[1].attributeSelector
 			};
 			msCount++;
 		}
 		else{
+			var checkStarteDt = yearCheck(root[a].headers[2].name);
+			var checkedEndDt = yearCheck(root[a].headers[3].name);
 			tasks[tskCount] = {
 				id: a+1,
 				category: root[a].headers[0].name,
 				label: root[a].headers[1].name,
 				progress: root[a].values[0].rv,
-				startDate: new Date(root[a].headers[2].name),
-				endDate: new Date(root[a].headers[3].name),
+				startDate: checkStarteDt, /* new Date(root[a].headers[2].name), //old way to get date */
+				endDate: checkedEndDt, /* new Date(root[a].headers[3].name), //old way to get date */
 				selection: root[a].headers[1].attributeSelector
 			};
 			tskCount++;
@@ -265,11 +316,11 @@ d3.gantt = function() {
     var margin = {
 		top : 20,
 		right:  40,
-		bottom : 140,
+		bottom : bottomMarginValue,
 		left : 100
     };
 
-    var height = null; //domNode.clientHeight; // if no height provided, chart height will be calculated with task bar height
+    var height = null; //domNode.clientHeight - margin.top - margin.bottom; // if no height provided, chart height will be calculated with task bar height
     var width = domNode.clientWidth - margin.left - margin.right;  // if no width provided, the chart will expand to screen width
 	//console.log("var height: " + height + "\n" + "var width: " + width);
     var mileStoneRadius = 2;
@@ -319,7 +370,7 @@ d3.gantt = function() {
     		chartWidth = width;
     	} else {
     		chartWidth = document.body.clientWidth - margin.right - margin.left-5;
-			console.log("getChartWidth: " + chartWidth);
+			//console.log("getChartWidth: " + chartWidth);  //debugging
     	}
     	return chartWidth;
     };
@@ -382,7 +433,7 @@ d3.gantt = function() {
 		    timeAxisRenderer.domain([timeDomainStart, timeDomainEnd]).init();
 			//quarterAxisRenderer.domain([timeDomainStart, timeDomainEnd]).init();
 		}
-		console.log("Time domain: [" + timeDomainStart + "," + timeDomainEnd + "]")
+		//console.log("Time domain: [" + timeDomainStart + "," + timeDomainEnd + "]")  //debugging
     };
 
     var calculateCategories = function(tasks){
@@ -402,10 +453,10 @@ d3.gantt = function() {
 
     var configureAxisDomain = function() {
 		//debugger;
-		timeAxisRenderer.domain([ timeDomainStart, timeDomainEnd ]).tickFormat(tickFormat).configValue("axisLength",(domNode.clientWidth - margin.left - margin.right)).configValue("hideAxis", hideCYAxisBool).configValue("strokeColor", colorByTheme);
-		quarterAxisRenderer.domain([ timeDomainStart, timeDomainEnd ]).configValue("axisLength",(domNode.clientWidth - margin.left - margin.right)).configValue("hideAxis", hideCYQtrAxisBool).configValue("strokeColor", colorByTheme);
-		FYAxisRenderer.domain([ timeDomainStart, timeDomainEnd ]).configValue("axisLength",(domNode.clientWidth - margin.left - margin.right)).configValue("hideAxis", hideFYAxisBool).configValue("strokeColor", colorByTheme);
-		FYQtrAxisRenderer.domain([ timeDomainStart, timeDomainEnd ]).configValue("axisLength",(domNode.clientWidth - margin.left - margin.right)).configValue("hideAxis", hideFYQtrAxisBool).configValue("strokeColor", colorByTheme);
+		timeAxisRenderer.domain([ timeDomainStart, timeDomainEnd ]).tickFormat(tickFormat).configValue("axisLength",(domNode.clientWidth - margin.left - margin.right)).configValue("hideAxis", hideCYAxisBool).configValue("strokeColor", colorByTheme).configValue("rotateLabels", rotateXAxisLabelsBool);
+		quarterAxisRenderer.domain([ timeDomainStart, timeDomainEnd ]).configValue("axisLength",(domNode.clientWidth - margin.left - margin.right)).configValue("hideAxis", hideCYQtrAxisBool).configValue("strokeColor", colorByTheme).configValue("rotateLabels", rotateXAxisLabelsBool);
+		FYAxisRenderer.domain([ timeDomainStart, timeDomainEnd ]).configValue("axisLength",(domNode.clientWidth - margin.left - margin.right)).configValue("hideAxis", hideFYAxisBool).configValue("strokeColor", colorByTheme).configValue("rotateLabels", rotateXAxisLabelsBool);
+		FYQtrAxisRenderer.domain([ timeDomainStart, timeDomainEnd ]).configValue("axisLength",(domNode.clientWidth - margin.left - margin.right)).configValue("hideAxis", hideFYQtrAxisBool).configValue("strokeColor", colorByTheme).configValue("rotateLabels", rotateXAxisLabelsBool);
 		timeAxisRenderer.init();
 		quarterAxisRenderer.init();
 		FYAxisRenderer.init();
@@ -415,7 +466,7 @@ d3.gantt = function() {
 			// if no categories provided, calculate them from task categories
 			categories = calculateCategories(tasks)
 		}
-		categoryAxisRenderer.overlappingResolver(overlappingResolver).categories(categories).configValue("strokeColor", colorByTheme).configValue("yAxisTitle", yAxisTitle).configValue("hideTitle", hideYAxisTitleBool);
+		categoryAxisRenderer.overlappingResolver(overlappingResolver).categories(categories).configValue("strokeColor", colorByTheme).configValue("yAxisTitle", yAxisTitle).configValue("catLabelHgtFactor", catLabelHgtInt).configValue("barMargin", barMarginHeightInt).configValue("hideTitle", hideYAxisTitleBool);
 		if(height != null){
 			categoryAxisRenderer.configValue("axisLength", height);
 		}
@@ -485,20 +536,45 @@ d3.gantt = function() {
 
 		var chartnode = d3.select(domNode).selectAll("svg").data([id], function(d){ return d;})
 			.enter()
+			.append("div")
+			.attr("id", "chartContainer")
+			.style("position", "relative")
+			.append("div").attr("id", absParent).style("position", "absolute")
+			.attr("height", "100%")
+			.attr("width", "100%")
 			.append("svg")
 			.attr("class", "chart")
+			/* .attr("height", "100%")
+			.attr("width", "100%") */
 			.style("overflow", "auto")
-			.on("click", function () { //this "deselects" and "clears" a selection when using viz as a selector
+			.attr('pointer-events', 'all')
+			
+			.on("mousedown", function () { //this "deselects" and "clears" a selection when using viz as a selector
 				me.clearSelections();
                 me.endSelections();
 			})
 			.append("g")
 			.attr("class", "gantt-chart")
+/* 			.on("mousedown", function () { //this "deselects" and "clears" a selection when using viz as a selector
+				me.clearSelections();
+                me.endSelections();
+			}) */
 			//.style("width", (getChartWidth() - margin.left - margin.right)) //original code - omitted for fitting of MSTR domNode
 			.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+			
+			d3.select("#" + absParent)/* .append("div").attr("id", "toolTipParent").style("position", "absolute").style("z-index", "999") */
+			.append("div").attr("id", tooltipID).attr("class", "hidden tooltip").append("p").append("strong").append("p").append("span").attr("id", "value");
+			
+			d3.select("#" + absParent).append("canvas").attr("style", "height:100%").attr("style", "width:100%").attr("style", "visibility: hidden");
+			
+			d3.select("#" + tooltipID + " p").style("font-size", tooltipSizeFromProps);
       
 		// add nodeing elements for graph components
-		var gridnode = chartnode.append("g").attr("class","grid-group");
+		var gridnode = chartnode.append("g").attr("class","grid-group")
+			.on("mousedown", function () { //this "deselects" and "clears" a selection when using viz as a selector
+				me.clearSelections();
+                me.endSelections();
+			});
 		var yAxisnode = chartnode.append("g").attr("class", "yaxis-group");
 		var xAxisnode = chartnode.append("g").attr("class", "xaxis-group");
 		var xAxisnodeQtr = chartnode.append("g").attr("class", "qtr-group");
@@ -545,7 +621,7 @@ d3.gantt = function() {
 		 	.call(assignEvent,"dateline");
 		
 	    // draw datelines and labels
-	    datelineRenderer.configValue("chartHeight",getChartHeight())
+	    datelineRenderer.configValue("chartHeight",getChartHeight()).configValue("tooltipID", tooltipID)
 	    	.eventHandlers(eventHandlers["dateline"]).draw(nodes);
     }
     
@@ -567,7 +643,7 @@ d3.gantt = function() {
 		 	.attr("transform", mileStoneTransform)
 
 	    // draw milestone marks and labels
-	    msRenderer.eventHandlers(eventHandlers["milestone"]).getThisForSel(me).configValue("showLabels", hideLabelBool).draw(nodes);
+	    msRenderer.eventHandlers(eventHandlers["milestone"]).getThisForSel(me).configValue("showLabels", hideLabelBool).configValue("tooltipID", tooltipID).draw(nodes);
 	}
 
     /* checks if a task is visible */
@@ -607,7 +683,7 @@ d3.gantt = function() {
 		 .attr("transform", taskBarTransform);
 
 	    // draw task bars
-	    taskRenderer.calculateBarWidth(calculateBarWidth).eventHandlers(eventHandlers["task"]).getThisForSel(me).configValue("showLabels", hideLabelBool).configValue("dateLabels", hideDateLabelBool).draw(nodes);
+	    taskRenderer.calculateBarWidth(calculateBarWidth).eventHandlers(eventHandlers["task"]).getThisForSel(me).configValue("showLabels", hideLabelBool).configValue("dateLabels", hideDateLabelBool).configValue("tooltipID", tooltipID).draw(nodes);
 
     }
 
@@ -626,10 +702,11 @@ d3.gantt = function() {
     var resizeChart = function(){
 		//debugger;
     	var svgElement = d3.select(domNode).select("svg").data([id], function(d){ return d;});
-    	svgElement.style("height", (getChartHeight() + margin.top + margin.bottom))
+    	svgElement.style("height", (getChartHeight() + margin.top + margin.bottom)).attr("viewBox", "0 0 "+ domNode.clientWidth + " "  + (getChartHeight() + margin.top + margin.bottom) ).attr("preserveAspectRatio", "xMinYMin slice").attr("height", (getChartHeight() + margin.top + margin.bottom)).attr("width", domNode.clientWidth)
 			//.style("width", (getChartWidth() - margin.left - margin.right)); //original code
 			.style("width", domNode.clientWidth); //uses MSTR domNode for width
-		console.log("Chart resized to " + (getChartHeight() + margin.top + margin.bottom) + " height" + "\n" + (domNode.clientWidth) + " width.");
+		//console.log("Chart resized to " + (getChartHeight() + margin.top + margin.bottom) + " height" + "\n" + (domNode.clientWidth) + " width."); //debugging
+		/* d3.select("canvas").attr("style", "height:" + (getChartHeight() + margin.top + margin.bottom)).attr("style", "width:" + domNode.clientWidth); */
 		
     }
 
@@ -807,7 +884,8 @@ d3.timeAxisRenderer = function(){
 	var config = {
 		"axisLength": 600,
 		"hideAxis": false,
-		"strokeColor": 'black'
+		"strokeColor": 'black',
+		"rotateLabels": false
 	};
 	var x = null;
 	var xAxis = null;
@@ -817,7 +895,6 @@ d3.timeAxisRenderer = function(){
 
 	/* Calculates categories ranges */
 	timeAxisRenderer.init  = function(){	
-		console.log(config.axisLength);
 		//debugger;
 		x = d3.time.scale().domain([ timeDomain[0], timeDomain[1] ]).range([ 0, config.axisLength ]).clamp(true);
 		var formatter = d3.time.format(new String(formatPattern));
@@ -837,7 +914,9 @@ d3.timeAxisRenderer = function(){
 	timeAxisRenderer.draw  = function(node){
 		node.transition().call(xAxis);
 		node.selectAll(".tick minor").attr("style", "stroke:" + config.strokeColor);
-		node.selectAll("text").attr("style", "fill:" + config.strokeColor + "; text-anchor: middle;");
+		node.selectAll("text").style("fill", config.strokeColor)/* .attr("style", "fill:" + config.strokeColor + "; text-anchor: middle;") */;
+		if(config.rotateLabels)
+			node.selectAll("text").style("text-anchor", "end").attr("dx", "-.8em").attr("dy", ".15em").attr("transform", "rotate(-45)" );
 		node.selectAll("line").attr("style", "stroke:" + config.strokeColor);
 		node.selectAll(".domain").attr("style", "stroke:" + config.strokeColor);
 	}
@@ -885,7 +964,8 @@ d3.quarterAxisRenderer = function(){
 	var config = {
 		"axisLength": 600,
 		"hideAxis": true,
-		"strokeColor": 'black'
+		"strokeColor": 'black',
+		"rotateLabels": false
 	};
 	var x2 = null;
 	var xAxisQtr = null;
@@ -929,6 +1009,8 @@ d3.quarterAxisRenderer = function(){
 		node.transition().call(xAxisQtr);
 		node.selectAll(".tick minor").attr("style", "stroke:" + config.strokeColor);
 		node.selectAll("text").attr("style", "fill:" + config.strokeColor + "; text-anchor: middle;");
+		if(config.rotateLabels)
+			node.selectAll("text").style("text-anchor", "end").attr("dx", "-.8em").attr("dy", ".15em").attr("transform", "rotate(-45)" );
 		node.selectAll("line").attr("style", "stroke:" + config.strokeColor);
 		node.selectAll(".domain").attr("style", "stroke:" + config.strokeColor);
 	}
@@ -970,11 +1052,11 @@ d3.FYQtrAxisRenderer = function(){
 	var config = {
 		"axisLength": 600,
 		"hideAxis": true,
-		"strokeColor": 'black'
+		"strokeColor": 'black',
+		"rotateLabels": false
 	};
 	var x = null;
 	var xAxisFYQtr = null;
-	console.log(timeDomain[0]);
 	
 	var getHideAxisConfig = function(g){
 		g.selectAll(".xaxis-group").classed("hidden", config.hideAxis);
@@ -1013,6 +1095,8 @@ d3.FYQtrAxisRenderer = function(){
 		node.transition().call(xAxisFYQtr)/* .call(getHideAxisConfig) *//* .classed("hidden", config.hideAxis) *//* .call(xAxisQtrLabel).call(alignLabels) */;
 		node.selectAll(".tick minor").attr("style", "stroke:" + config.strokeColor);
 		node.selectAll("text").attr("style", "fill:" + config.strokeColor + "; text-anchor: middle;");
+		if(config.rotateLabels)
+			node.selectAll("text").style("text-anchor", "end").attr("dx", "-.8em").attr("dy", ".15em").attr("transform", "rotate(-45)" );
 		node.selectAll("line").attr("style", "stroke:" + config.strokeColor);
 		node.selectAll(".domain").attr("style", "stroke:" + config.strokeColor);
 	}
@@ -1054,11 +1138,11 @@ d3.FYAxisRenderer = function(){
 	var config = {
 		"axisLength": 600,
 		"hideAxis": true,
-		"strokeColor": 'black'
+		"strokeColor": 'black',
+		"rotateLabels": false
 	};
 	var x = null;
 	var xAxisFY = null;
-	console.log(timeDomain[0]);
 
 	/* PUBLIC METHODS */
 
@@ -1072,6 +1156,8 @@ d3.FYAxisRenderer = function(){
 		node.transition().call(xAxisFY)/* .classed("hidden", config.hideAxis) *//* .call(xAxisQtrLabel).call(alignLabels) */;
 		node.selectAll(".tick minor").attr("style", "stroke:" + config.strokeColor);
 		node.selectAll("text").attr("style", "fill:" + config.strokeColor + "; text-anchor: middle;");
+		if(config.rotateLabels)
+			node.selectAll("text").style("text-anchor", "end").attr("dx", "-.8em").attr("dy", ".15em").attr("transform", "rotate(-45)" );
 		node.selectAll("line").attr("style", "stroke:" + config.strokeColor);
 		node.selectAll(".domain").attr("style", "stroke:" + config.strokeColor);
 	}
@@ -1124,7 +1210,8 @@ d3.categoryAxisRenderer = function(){
 		"mileStoneHeight" : 15,
 		"strokeColor" : 'black',
 		"yAxisTitle": "",
-		"hideTitle": false
+		"hideTitle": false,
+		"catLabelHgtFactor": 2
 	};
 
 	/* PUBLIC METHODS */
@@ -1235,7 +1322,7 @@ d3.categoryAxisRenderer = function(){
 			.append("text")
 			.attr("x", "-5")
 			.style("fill", config.strokeColor)
-			.style("dominant-baseline", "middle")
+			.style("dominant-baseline", "auto")
 			.style("text-anchor", "end")
 			//.attr("class", "tickY-label")
 			/*
@@ -1261,6 +1348,7 @@ d3.categoryAxisRenderer = function(){
     		.attr("y2",function(d){ return d;})
 			.attr("style", "stroke:" + config.strokeColor);
 		
+		//add yaxis title which is pulled from source Parent Column header
 		node.append("text")
 			.attr("id", "yAxisTitle")
     		.attr("x","-50")
@@ -1292,9 +1380,9 @@ d3.categoryAxisRenderer = function(){
 
 	var catnodeTranslation = function(d){
 		var range = getCategoryRange(d);
-		var ypos = range[0] + (range[1]-range[0])/2;
+		var ypos = range[0] + (range[1]-range[0])/config.catLabelHgtFactor;
 
-		return "translate(0," + scaleValue(ypos)+ ')'
+		return "translate(0," + scaleValue(ypos)+ ")"
 	}
 
 	var scaleValue = function(value){
@@ -1511,14 +1599,15 @@ d3.taskRenderer = function(){
 		"barHeight" : 15,
 		"progressBarHeight" : 5,
 		"showLabels": false,
-		"dateLabels": true
+		"dateLabels": true,
+		"tooltipID": ""
 	};
     var eventAssigner = null;
     var calculateBarWidth = null;
     var eventHandlers = null;
 	var getThisForSel = null;
 	
-	console.log("Inside taskRenderer: showLabels: " + config.showLabels);
+	//console.log("Inside taskRenderer: showLabels: " + config.showLabels); //used for debugging
 
     var assignEvent = function (selection){
     	for(h in eventHandlers){
@@ -1546,30 +1635,45 @@ d3.taskRenderer = function(){
 			}
 		})
 		.on("mouseover", function(d) {
+			/*var mouseCoords = [0, 0];
+			mouseCoords = d3.transform(d3.mouse(this.parentNode)).translate;
+			console.log(mouseCoords);
+			console.log(d3.event.pageX);
+			console.log(d3.event.pageY); */
+			/* var matrix = this.getScreenCTM()
+            .translate(+this.getAttribute("cx"),
+                     +this.getAttribute("cy"));
+					 
+			console.log(matrix); */
+			
 			//Get this bar's x/y values, then augment for the tooltip
 			var translate = d3.transform(d3.select(this.parentNode).attr("transform")).translate;
+			//console.log(d3.select(this.parentNode).attr("class")); //debugging
 			var xPosition = translate[0];
+			//console.log("domNode: " + getThisForSel.domNode.id + " xPosition: " + xPosition);
 			var yPosition = translate[1];
+			//console.log("domNode: " + getThisForSel.domNode.id + " yPosition: " + yPosition);
 			var precisionPercent = d3.format(".1f")(d.progress*100)
 
 			//Update the tooltip position and value
-			d3.select("#tooltip")
-			  .style("left", xPosition + "px")
-			  .style("top", yPosition + "px")
+			d3.select("#" + config.tooltipID)
+			  .style("left", /* (window.pageXOffset + matrix.e) */xPosition + "px")
+			  .style("top", /* (window.pageYOffset + matrix.f + 30) */yPosition + "px")
 			  .select("#value")
 			  .html(d.label+"<br>"+"Start Date: "+d.startDate.toLocaleDateString("en-US")+"<br>" + "End Date: "+d.endDate.toLocaleDateString("en-US")+"<br>" + "Progress: "+ precisionPercent +"%");
 
 			//Show the tooltip
-			d3.select("#tooltip").classed("hidden", false);
+			d3.select("#" + config.tooltipID).classed("hidden", false);
 			})
 		.on("mouseout", function() {
 			//Hide the tooltip
-			d3.select("#tooltip").classed("hidden", true);
+			d3.select("#" + config.tooltipID).classed("hidden", true);
 		})
-		.on("click", function (d) {
+		.on("mousedown", function (d) {
 			// use the selector API when clicking on a bar
 			  getThisForSel.applySelection(d.selection);
-			  d3.event.stopPropagation();
+			  var event = event || window.event;
+			  event.stopPropagation();
 		})		
 		
 		// add progress bar's rect
@@ -1603,7 +1707,6 @@ d3.taskRenderer = function(){
 			.attr("fill", function(d) {
 				for (var i = 0; i < categories.length; i++) {
 				  if (d.category == categories[i]) {
-					//  console.log("true!");
 					return d3.rgb(colors(i)).darker(3);
 				  }
 				}
@@ -1692,7 +1795,8 @@ d3.msRenderer = function(){
 
 	var config = {
 		"mileStoneRadius":4,
-		"showLabels": false
+		"showLabels": false,
+		"tooltipID": ""
 	};
 	
 	var getThisForSel = null;
@@ -1721,10 +1825,18 @@ d3.msRenderer = function(){
 			})
     		.attr("r",config.mileStoneRadius)
     		//.call(assignEvent)
-			.on("click", function (d) {
+			.on("mousedown", function (d) {
 			// use the selector API when clicking on a bar
 			  getThisForSel.applySelection(d.selection);
-			  d3.event.stopPropagation();
+			  /* if (d3.event) {
+				d3.event.returnValue = false;
+			} */
+			  /* var event = d3.event || window.event;
+			  
+			  event.prototype.stopPropagation = event.prototype.stopPropagation || function() {
+				this.cancelBubble = true;
+			} */
+			  event.stopPropagation();
 			})	
 			.on("mouseover", function(d) {
 				//Get this bar's x/y values, then augment for the tooltip
@@ -1733,18 +1845,18 @@ d3.msRenderer = function(){
 				var yPosition = translate[1] - 40;
 
 				//Update the tooltip position and value
-				d3.select("#tooltip")
+				d3.select("#" + config.tooltipID)
 				  .style("left", xPosition + "px")
 				  .style("top", yPosition + "px")
 				  .select("#value")
 				  .html(d.label + "<br>" + "Date: " + d.date.toLocaleDateString("en-US"));
 
 				//Show the tooltip
-				d3.select("#tooltip").classed("hidden", false);
+				d3.select("#" + config.tooltipID).classed("hidden", false);
 			})
 			.on("mouseout", function() {
 				//Hide the tooltip
-				d3.select("#tooltip").classed("hidden", true);
+				d3.select("#" + config.tooltipID).classed("hidden", true);
 			});
 
 		// add labels
@@ -1804,7 +1916,8 @@ d3.msRenderer = function(){
 d3.datelineRenderer = function(){
 
 	var config = {
-		"chartHeight":100
+		"chartHeight":100,
+		"tooltipID": ""
 	};
 
     var assignEvent = function (selection){
@@ -1829,10 +1942,10 @@ d3.datelineRenderer = function(){
 			var xPosition = translate[0];
 			var yPosition = translate[1] + (config.chartHeight/2);
 			
-			var mouseCoords = d3.mouse(this);
+			/* var mouseCoords = d3.mouse(this); */
 
 			//Update the tooltip position and value
-			d3.select("#tooltip")
+			d3.select("#" + config.tooltipID)
 			  .style("left", xPosition + "px")
 			  .style("top", yPosition + "px")
 			  /* .style("left", mouseCoords[0] + "px")
@@ -1841,11 +1954,11 @@ d3.datelineRenderer = function(){
 			  .html("Dateline: " + d.date.toLocaleDateString("en-US"));
 
 			//Show the tooltip
-			d3.select("#tooltip").classed("hidden", false);
+			d3.select("#" + config.tooltipID).classed("hidden", false);
 			})
 		.on("mouseout", function() {
 			//Hide the tooltip
-			d3.select("#tooltip").classed("hidden", true);
+			d3.select("#" + config.tooltipID).classed("hidden", true);
 		});
 		/* node.append("text")
 		.attr("x","7")

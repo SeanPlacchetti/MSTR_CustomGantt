@@ -28,13 +28,11 @@ value: [{
 			propertyName: 'showDateLine', 
             labelText: "Date Line"
 			},
-			
 			{
 			style: $WT.CHECKBOXANDLABEL,
 			propertyName: 'showChangeDate',
-			labelText: "Check this box if you want to change the dateline date from the default of today's date."
+			labelText: "Override Dateline Location"
 			},
-			
 			{           
             style: $WT.TWOCOLUMN,
 			disabled: vizHost.getProperty('showChangeDate') === "false",
@@ -151,6 +149,84 @@ value: [{
 				  ]
 				}
 			  ]
+			},
+			{
+			style: $WT.CHECKBOXANDLABEL,
+			propertyName: 'showRowLabelHgt',
+			labelText: "Override Parent Row Height and Label Locations"
+			},
+			{
+			style: $WT.TWOCOLUMN,
+			disabled: vizHost.getProperty('showRowLabelHgt') === "false",
+			items: [
+				{
+					style: $WT.LABEL,
+					name: "text",
+					width: "60%",
+					labelText: "Adjust Y-Axis Labels Higher:"
+				},
+				{
+					style: $WT.STEPPER,
+					propertyName: "catLabelHgt",
+					width: "40%",
+					min: 2,
+					max: 10
+				}
+			  ]
+			},
+			{
+			style: $WT.TWOCOLUMN,
+			disabled: vizHost.getProperty('showRowLabelHgt') === "false",
+			items: [
+				{
+					style: $WT.LABEL,
+					name: "text",
+					width: "80%",
+					labelText: "Increase height of Parent Row Sections:"
+				},
+				{
+					style: $WT.COMBOBOX,
+					propertyName: "barMarginHeight",
+					width: "20%",
+					items: [
+					{
+						name: 10
+					},
+					{
+						name: 20
+					},
+					{
+						name: 30
+					},
+					{
+						name: 40
+					},
+					{
+						name: 50
+					},
+					{
+						name: 60
+					},
+					{
+						name: 70
+					},
+					{
+						name: 80
+					},
+					{
+						name: 90
+					},
+					{
+						name: 100
+					}
+				  ]
+				}
+			  ]
+			},
+			{
+			style: $WT.CHECKBOXANDLABEL,
+			propertyName: 'rotateXAxisLabels', 
+            labelText: "Rotate X-Axis Labels"
 			}
 			/*
 			*This code display MSTR standard font editor
