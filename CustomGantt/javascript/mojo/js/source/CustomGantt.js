@@ -86,22 +86,28 @@ if (rotateXAxisLabelsBool) {
 var tallyAxisBools = function() {
     // show month axis, cyqtr axis, fyqtr axis, and fy axis
     if (!hideCYAxisBool && !hideCYQtrAxisBool && !hideFYAxisBool && !hideFYQtrAxisBool)
-        cyQtrAxisCount = axisSpacing, fyQtrAxisCount = axisSpacing*2, fyAxisCount = axisSpacing*3;
+        cyQtrAxisCount = axisSpacing,
+        fyQtrAxisCount = axisSpacing*2,
+        fyAxisCount = axisSpacing*3;
     // show month axis, cyqtr axis
     if (!hideCYAxisBool && !hideCYQtrAxisBool && hideFYAxisBool && hideFYQtrAxisBool)
         cyQtrAxisCount = axisSpacing;
     // show cyqtr axis, fyqtr axis, fy axis
     if (hideCYAxisBool && !hideCYQtrAxisBool && !hideFYAxisBool && !hideFYQtrAxisBool)
-        fyQtrAxisCount = axisSpacing, fyAxisCount = axisSpacing*2;
+        fyQtrAxisCount = axisSpacing,
+        fyAxisCount = axisSpacing*2;
     // show month axis, cyqtr axis, fy axis
     if (!hideCYAxisBool && hideFYQtrAxisBool && !hideCYQtrAxisBool && !hideFYAxisBool)
-        cyQtrAxisCount = axisSpacing, fyAxisCount = axisSpacing*2;
+        cyQtrAxisCount = axisSpacing,
+        fyAxisCount = axisSpacing*2;
     // show month axis, cyqtr axis, fyqtr axis
     if (!hideCYAxisBool && !hideCYQtrAxisBool && hideFYAxisBool && !hideFYQtrAxisBool)
-        cyQtrAxisCount = axisSpacing, fyQtrAxisCount = axisSpacing*2;
+        cyQtrAxisCount = axisSpacing,
+        fyQtrAxisCount = axisSpacing*2;
     // show month axis, fy axis, fyqtr axis
     if (!hideCYAxisBool && !hideFYAxisBool && hideCYQtrAxisBool && !hideFYQtrAxisBool)
-        fyQtrAxisCount = axisSpacing, fyAxisCount = axisSpacing*2;
+        fyQtrAxisCount = axisSpacing,
+        fyAxisCount = axisSpacing*2;
     // show cyqtr axis, fyqtr axis
     if (hideCYAxisBool && hideFYAxisBool && !hideCYQtrAxisBool && !hideFYQtrAxisBool)
         fyQtrAxisCount = axisSpacing;
@@ -126,12 +132,12 @@ var me = this;
 // assign domNode to a variable
 var domNode = this.domNode;
 var makeid = function () {
-            var text = "";
-            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-            for ( var i=0; i < 5; i++ )
-                text += possible.charAt(Math.floor(Math.random() * possible.length));
-            return text;
-        };
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    for ( var i=0; i < 5; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+};
         
 var absParent = "absParent" + makeid();
 var tooltipID = "tooltip" + makeid();
@@ -248,34 +254,27 @@ toggleDateLine(showDateLineBool);
 
 d3.gantt = function() {
     // Chart rendering properties
-    var FIT_TIME_DOMAIN_MODE = "fit",
-        FIXED_TIME_DOMAIN_MODE = "fixed",
-        id = Math.floor((Math.random()*1000000)+1);
-    var margin = {
-        top : 20,
-        right:  40,
-        bottom : bottomMarginValue,
-        left : 100
-    };
-    // if no height provided, chart height will be calculated with task bar height
-    var height = null;
-    // if no width provided, the chart will expand to screen width
-    var width = domNode.clientWidth - margin.left - margin.right;
-    var mileStoneRadius = 2;
-    var timeDomainStart = null;
-    var timeDomainEnd = null;
-    // fixed or fit
-    var timeDomainMode = FIT_TIME_DOMAIN_MODE;
-    // default tick format
-    var tickFormat = "%b-%d-%y";
-
-    // model arrays
-    var categories = [],
+    var id = Math.floor((Math.random()*1000000)+1),
+        margin = {
+            top : 20,
+            right:  40,
+            bottom : bottomMarginValue,
+            left : 100
+        },
+        // if no height provided, chart height will be calculated with task bar height
+        // if no width provided, the chart will expand to screen width
+        height = null,
+        width = domNode.clientWidth - margin.left - margin.right,
+        mileStoneRadius = 2,
+        timeDomainStart = null,
+        timeDomainEnd = null,
+        timeDomainMode = "fit", // fixed or fit
+        tickFormat = "%b-%d-%y", // default tick format
+        categories = [],
         tasks = [],
         mileStones = [],
-        dateLines = [];
-
-    var overlappingResolver = d3.overlappingResolver(),
+        dateLines = [],
+        overlappingResolver = d3.overlappingResolver(),
         categoryAxisRenderer = d3.categoryAxisRenderer(),
         timeAxisRenderer = d3.timeAxisRenderer(),
         quarterAxisRenderer = d3.quarterAxisRenderer(),
@@ -283,12 +282,12 @@ d3.gantt = function() {
         FYQtrAxisRenderer = d3.FYQtrAxisRenderer(),
         taskRenderer = d3.taskRenderer(),
         msRenderer = d3.msRenderer(),
-        datelineRenderer = d3.datelineRenderer();
-    var eventHandlers = {
-        "task": {},
-        "milestone":{},
-        "dateline":{}
-    };
+        datelineRenderer = d3.datelineRenderer(),
+        eventHandlers = {
+            "task": {},
+            "milestone":{},
+            "dateline":{}
+        };
 
     var getChartHeight = function() {
         return (height !== null && height > 0) ? height : categoryAxisRenderer.calculatedLength();
@@ -342,7 +341,7 @@ d3.gantt = function() {
     };
 
     var initTimeDomain = function(tasks) {
-        if (timeDomainMode === FIT_TIME_DOMAIN_MODE) {
+        if (timeDomainMode === "fit") {
             if (tasks === undefined || tasks.length < 1) {
                 timeDomainStart = d3.time.day.offset(new Date(), -3);
                 timeDomainEnd = d3.time.hour.offset(new Date(), +3);
@@ -410,12 +409,6 @@ d3.gantt = function() {
             categoryAxisRenderer.configValue("axisLength", height);
         }
         categoryAxisRenderer.init();
-    };
-
-    var drawAxis = function() {
-        configureAxisDomain();
-        drawGrid();
-        renderAxis();
     };
 
     var renderAxis = function() {
@@ -654,7 +647,9 @@ d3.gantt = function() {
         // calculate task overlapping
         overlappingResolver.tasks(visibleTasks).calculateOverlapping();
         // render axis
-        drawAxis();
+        configureAxisDomain();
+        drawGrid();
+        renderAxis();
         // render task model visualization
         drawTasks(tasks);
         drawDateLines(dateLines);
@@ -814,17 +809,17 @@ d3.gantt = function() {
 };
 
 d3.timeAxisRenderer = function() {
-    var scale = 1;
-    var timeDomain = [];
-    var config = {
-        "axisLength": 600,
-        "hideAxis": false,
-        "strokeColor": "black",
-        "rotateLabels": false
-    };
-    var x = null;
-    var xAxis = null;
-    var formatPattern = "%b-%d-%y";
+    var scale = 1,
+        timeDomain = [],
+        config = {
+            "axisLength": 600,
+            "hideAxis": false,
+            "strokeColor": "black",
+            "rotateLabels": false
+        },
+        x = null,
+        xAxis = null,
+        formatPattern = "%b-%d-%y";
 
     /* Calculates categories ranges */
     timeAxisRenderer.init  = function() {
@@ -838,10 +833,12 @@ d3.timeAxisRenderer = function() {
         var tickPositions = domainValues.map(function(d) { return x(d);});
         return tickPositions;
     };
+
     // Calculates object rendering position in axis
     timeAxisRenderer.position = function(d) {
         return x(d);
     };
+
     // Draws axis hanging on the svg node passed as parameter
     timeAxisRenderer.draw  = function(node) {
         node.transition().call(xAxis);
@@ -887,16 +884,16 @@ d3.timeAxisRenderer = function() {
 };
 
 d3.quarterAxisRenderer = function() {
-    var scale = 1;
-    var timeDomain = [];
-    var config = {
-        "axisLength": 600,
-        "hideAxis": true,
-        "strokeColor": "black",
-        "rotateLabels": false
-    };
-    var x2 = null;
-    var xAxisQtr = null;
+    var scale = 1,
+        timeDomain = [],
+        config = {
+            "axisLength": 600,
+            "hideAxis": true,
+            "strokeColor": "black",
+            "rotateLabels": false
+        },
+        x2 = null,
+        xAxisQtr = null;
 
     var getHideAxisConfig = function(g) {
         g.selectAll(".xaxis-qtr-group").classed("hidden", config.hideAxis);
@@ -906,15 +903,12 @@ d3.quarterAxisRenderer = function() {
         x2 = d3.time.scale().domain([ d3.time.day.offset(timeDomain[0], -45), d3.time.day.offset(timeDomain[1], -45) ]).nice().range([ 0, config.axisLength ])/* .clamp(true) */;
         xAxisQtr = d3.svg.axis().scale(x2).orient("bottom").ticks(d3.time.months, 3).tickSize(0,8,0).tickSubdivide(1)
                         .tickFormat( function ( x2  ) {
-                             // get the milliseconds since Epoch for the date
-                             var milli = (d3.time.day.offset(x2, 45).getTime() - 10000);
-
                              // calculate new date 10 seconds earlier
-                             var earlyDate = new Date(milli);
+                             var earlyDate = new Date(d3.time.day.offset(x2, 45).getTime() - 10000);
 
                              // calculate the month (0-11) based on the new date
-                             var mon = earlyDate.getMonth();
-                             var yr = earlyDate.getFullYear().toString().substr(2,2);
+                             var mon = earlyDate.getMonth(),
+                                 yr = earlyDate.getFullYear().toString().substr(2,2);
 
                              // return appropriate quarter for that month
                              if ( mon <= 2 ) {
@@ -983,29 +977,35 @@ d3.FYQtrAxisRenderer = function() {
     };
 
     FYQtrAxisRenderer.init  = function() {
-        x = d3.time.scale().domain([ d3.time.day.offset(timeDomain[0], -45), d3.time.day.offset(timeDomain[1], -45) ]).nice().range([ 0, config.axisLength ]);
-        xAxisFYQtr = d3.svg.axis().scale(x).orient("bottom").ticks(d3.time.months, 3).tickSize(0,8,0).tickSubdivide(1).tickFormat(function ( x  ) {
-                             // get the milliseconds since Epoch for the date
-                             var milli = (d3.time.day.offset(x, 105).getTime() - 10000);
-
-                             // calculate new date 10 seconds earlier
-                             var earlyDate = new Date(milli);
-
-                             // calculate the month (0-11) based on the new date
-                             var mon = earlyDate.getMonth();
-                             var yr = earlyDate.getFullYear().toString().substr(2,2);
-
-                             // return appropriate quarter for that month
-                             if ( mon <= 2 ) {
-                                 return  "Q1 FY" + yr;
-                             } else if ( mon <= 5 ) {
-                                 return  "Q2 FY" + yr;
-                             } else if ( mon <= 8 ) {
-                                 return  "Q3 FY" + yr;
-                             } else {
-                                 return "Q4 FY" + yr;
-                             }
-                         });
+        x = d3.time
+              .scale()
+              .domain([ d3.time.day.offset(timeDomain[0], -45), d3.time.day.offset(timeDomain[1], -45) ])
+              .nice()
+              .range([ 0, config.axisLength ]);
+        xAxisFYQtr = d3.svg
+                       .axis()
+                       .scale(x)
+                       .orient("bottom")
+                       .ticks(d3.time.months, 3)
+                       .tickSize(0,8,0)
+                       .tickSubdivide(1)
+                       .tickFormat(function(x) {
+                           // calculate new date 10 seconds earlier
+                           var earlyDate = new Date(d3.time.day.offset(x, 105).getTime() - 10000);
+                           // calculate the month (0-11) based on the new date
+                           var mon = earlyDate.getMonth(),
+                               yr = earlyDate.getFullYear().toString().substr(2,2);
+                           // return appropriate quarter for that month
+                           if ( mon <= 2 ) {
+                               return  "Q1 FY" + yr;
+                           } else if ( mon <= 5 ) {
+                               return  "Q2 FY" + yr;
+                           } else if ( mon <= 8 ) {
+                               return  "Q3 FY" + yr;
+                           } else {
+                               return "Q4 FY" + yr;
+                           }
+                       });
     };
 
     // Draws Qtr axis hanging on the svg node passed as parameter
@@ -1013,22 +1013,29 @@ d3.FYQtrAxisRenderer = function() {
         node.transition().call(xAxisFYQtr);
         node.selectAll(".tick minor").attr("style", "stroke:" + config.strokeColor);
         node.selectAll("text").attr("style", "fill:" + config.strokeColor + "; text-anchor: middle;");
-        if (config.rotateLabels)
-            node.selectAll("text").style("text-anchor", "end").attr("dx", "-.8em").attr("dy", ".15em").attr("transform", "rotate(-45)" );
+        if (config.rotateLabels) {
+            node.selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", "rotate(-45)" );
+        }
         node.selectAll("line").attr("style", "stroke:" + config.strokeColor);
         node.selectAll(".domain").attr("style", "stroke:" + config.strokeColor);
     };
 
     FYQtrAxisRenderer.domain = function(value) {
-        if (!arguments.length)
+        if (!arguments.length) {
             return timeDomain;
+        }
         timeDomain = value;
         return FYQtrAxisRenderer;
     };
 
     FYQtrAxisRenderer.config = function(value) {
-        if (!arguments.length)
+        if (!arguments.length) {
             return config;
+        }
         // copy values in config object
         for (var k in config) config[k]=value[k];
         return FYQtrAxisRenderer;
