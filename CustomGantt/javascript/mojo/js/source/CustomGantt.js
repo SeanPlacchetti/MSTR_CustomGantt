@@ -168,11 +168,8 @@ var getCategories = function getCategories(root) {
 // get the categories from the dataModel
 getCategories(dataModel);
 
-/*
-* JavaScript does not recognize two digit years (i.e. yy) correctly,
-* the below method checks the inputted date.  The year must be in the last place (i.e. dd/mm/yyyy or dd/mm/yy)
-* If the date input has a year with two digits the function corrects it
-*/
+// Checks the inputted date.  The year must be in the last place (i.e. dd/mm/yyyy or dd/mm/yy)
+// If the date input has a year with two digits the function corrects it
 var dateFmt = function(date) {
     var dateObj = new Date(date);
     var dateArr = date.split(/[/-]/);
@@ -185,7 +182,6 @@ var dateFmt = function(date) {
 };
 
 // Below function gets the individual tasks and milestones from the dataModel
-
 var getTasksAndMilestones = function getTasksAndMilestones(root) {
     tasks = [];
     var msCount = 0,
@@ -515,9 +511,18 @@ d3.gantt = function() {
         var xAxisnode = chartnode.append("g").attr("class", "xaxis-group");
         var xAxisnodeQtr = chartnode.append("g").attr("class", "qtr-group");
         var barnode = chartnode.append("g").attr("class", "gantt-bars");
-        xAxisnodeQtr = d3.select(domNode).selectAll(".gantt-chart").append("g").attr("class", "qtr-group");
-        var xAxisnodeFY = d3.select(domNode).selectAll(".gantt-chart").append("g").attr("class", "fy-group");
-        var xAxisnodeFYQtr = d3.select(domNode).selectAll(".gantt-chart").append("g").attr("class", "fy-qtr-group");                                                                         
+        xAxisnodeQtr = d3.select(domNode)
+                         .selectAll(".gantt-chart")
+                         .append("g")
+                         .attr("class", "qtr-group");
+        var xAxisnodeFY = d3.select(domNode)
+                            .selectAll(".gantt-chart")
+                            .append("g")
+                            .attr("class", "fy-group");
+        var xAxisnodeFYQtr = d3.select(domNode)
+                               .selectAll(".gantt-chart")
+                               .append("g")
+                               .attr("class", "fy-qtr-group");
     };
 
     var init = function () {
@@ -529,7 +534,7 @@ d3.gantt = function() {
     // Checks if chart components are already configured
     var isInitialized = function() {
         // check if svg element exists, if it exists, chart has been initialized
-        var svgSelection = d3.select(domNode).selectAll("svg").data([id], function(d) { return d;});
+        var svgSelection = d3.select(domNode).selectAll("svg").data([id], function(d){return d;});
         return !svgSelection.empty();
     };
 
@@ -543,7 +548,7 @@ d3.gantt = function() {
         barnode.selectAll("g.g_dateline").remove();
 
         // create new graphic objects
-        var taskGSelection = barnode.selectAll("g").data(visibleDL,function(d) { return d.date; });
+        var taskGSelection = barnode.selectAll("g").data(visibleDL,function(d){return d.date; });
 
         var nodes = taskGSelection.enter()
                                   .append("g")
@@ -613,13 +618,19 @@ d3.gantt = function() {
 
         // append new task groups
         var taskGSelection = barnode.selectAll("g.g_task").data(visibleTasks,keyFunction);
-        var nodes = taskGSelection.enter().append("g")
-         .attr("class","g_task") 
-         .attr("y", 0)
-         .attr("transform", taskBarTransform);
-
+        var nodes = taskGSelection.enter()
+                                  .append("g")
+                                  .attr("class","g_task")
+                                  .attr("y", 0)
+                                  .attr("transform", taskBarTransform);
         // draw task bars
-        taskRenderer.calculateBarWidth(calculateBarWidth).eventHandlers(eventHandlers.task).getThisForSel(me).configValue("showLabels", hideLabelBool).configValue("dateLabels", hideDateLabelBool).configValue("tooltipID", tooltipID).draw(nodes);
+        taskRenderer.calculateBarWidth(calculateBarWidth)
+                    .eventHandlers(eventHandlers.task)
+                    .getThisForSel(me)
+                    .configValue("showLabels", hideLabelBool)
+                    .configValue("dateLabels", hideDateLabelBool)
+                    .configValue("tooltipID", tooltipID)
+                    .draw(nodes);
     };
 
     var getnodePosition = function(nodeNode) {
@@ -633,10 +644,16 @@ d3.gantt = function() {
     };
 
     var resizeChart = function() {
-        var svgElement = d3.select(domNode).select("svg").data([id], function(d) { return d;});
+        var svgElement = d3.select(domNode)
+                           .select("svg")
+                           .data([id], function(d){return d;});
         // uses MSTR domNode for width
-        svgElement.style("height", (getChartHeight() + margin.top + margin.bottom)).attr("viewBox", "0 0 "+ domNode.clientWidth + " "  + (getChartHeight() + margin.top + margin.bottom) ).attr("preserveAspectRatio", "xMinYMin slice").attr("height", (getChartHeight() + margin.top + margin.bottom)).attr("width", domNode.clientWidth)
-            .style("width", domNode.clientWidth);
+        svgElement.style("height", (getChartHeight() + margin.top + margin.bottom))
+                  .attr("viewBox", "0 0 "+ domNode.clientWidth + " "  + (getChartHeight() + margin.top + margin.bottom) )
+                  .attr("preserveAspectRatio", "xMinYMin slice")
+                  .attr("height", (getChartHeight() + margin.top + margin.bottom))
+                  .attr("width", domNode.clientWidth)
+                  .style("width", domNode.clientWidth);
     };
 
     gantt.draw = function() {
@@ -823,9 +840,20 @@ d3.timeAxisRenderer = function() {
 
     /* Calculates categories ranges */
     timeAxisRenderer.init  = function() {
-        x = d3.time.scale().domain([ timeDomain[0], timeDomain[1] ]).range([ 0, config.axisLength ]).clamp(true);
+        x = d3.time
+              .scale()
+              .domain([ timeDomain[0], timeDomain[1] ])
+              .range([ 0, config.axisLength ])
+              .clamp(true);
         var formatter = d3.time.format(new String(formatPattern));
-        xAxis = d3.svg.axis().scale(x).orient("bottom").tickSubdivide(true).tickSize(8,0).tickPadding(8).tickFormat(formatter);
+        xAxis = d3.svg
+                  .axis()
+                  .scale(x)
+                  .orient("bottom")
+                  .tickSubdivide(true)
+                  .tickSize(8,0)
+                  .tickPadding(8)
+                  .tickFormat(formatter);
     };
 
     timeAxisRenderer.ticks = function() {
@@ -844,8 +872,13 @@ d3.timeAxisRenderer = function() {
         node.transition().call(xAxis);
         node.selectAll(".tick minor").attr("style", "stroke:" + config.strokeColor);
         node.selectAll("text").style("fill", config.strokeColor);
-        if (config.rotateLabels)
-            node.selectAll("text").style("text-anchor", "end").attr("dx", "-.8em").attr("dy", ".15em").attr("transform", "rotate(-45)" );
+        if (config.rotateLabels) {
+            node.selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", "rotate(-45)");
+        }
         node.selectAll("line").attr("style", "stroke:" + config.strokeColor);
         node.selectAll(".domain").attr("style", "stroke:" + config.strokeColor);
     };
@@ -900,27 +933,35 @@ d3.quarterAxisRenderer = function() {
     };
 
     quarterAxisRenderer.init  = function() {
-        x2 = d3.time.scale().domain([ d3.time.day.offset(timeDomain[0], -45), d3.time.day.offset(timeDomain[1], -45) ]).nice().range([ 0, config.axisLength ])/* .clamp(true) */;
-        xAxisQtr = d3.svg.axis().scale(x2).orient("bottom").ticks(d3.time.months, 3).tickSize(0,8,0).tickSubdivide(1)
-                        .tickFormat( function ( x2  ) {
-                             // calculate new date 10 seconds earlier
-                             var earlyDate = new Date(d3.time.day.offset(x2, 45).getTime() - 10000);
-
-                             // calculate the month (0-11) based on the new date
-                             var mon = earlyDate.getMonth(),
-                                 yr = earlyDate.getFullYear().toString().substr(2,2);
-
-                             // return appropriate quarter for that month
-                             if ( mon <= 2 ) {
-                                 return  "Q1 CY" + yr;
-                             } else if ( mon <= 5 ) {
-                                 return  "Q2 CY" + yr;
-                             } else if ( mon <= 8 ) {
-                                 return  "Q3 CY" + yr;
-                             } else {
-                                 return "Q4 CY" + yr;
-                             }
-                         } );
+        x2 = d3.time
+               .scale()
+               .domain([ d3.time.day.offset(timeDomain[0], -45), d3.time.day.offset(timeDomain[1], -45) ])
+               .nice()
+               .range([ 0, config.axisLength ]);
+        xAxisQtr = d3.svg
+                     .axis()
+                     .scale(x2)
+                     .orient("bottom")
+                     .ticks(d3.time.months, 3)
+                     .tickSize(0,8,0)
+                     .tickSubdivide(1)
+                     .tickFormat(function(x2){
+                         // calculate new date 10 seconds earlier
+                         var earlyDate = new Date(d3.time.day.offset(x2, 45).getTime() - 10000);
+                         // calculate the month (0-11) based on the new date
+                         var mon = earlyDate.getMonth(),
+                             yr = earlyDate.getFullYear().toString().substr(2,2);
+                         // return appropriate quarter for that month
+                         if ( mon <= 2 ) {
+                             return  "Q1 CY" + yr;
+                         } else if ( mon <= 5 ) {
+                             return  "Q2 CY" + yr;
+                         } else if ( mon <= 8 ) {
+                             return  "Q3 CY" + yr;
+                         } else {
+                             return "Q4 CY" + yr;
+                         }
+                     });
     };
 
     /* Draws Qtr axis hanging on the svg node passed as parameter */
@@ -979,9 +1020,9 @@ d3.FYQtrAxisRenderer = function() {
     FYQtrAxisRenderer.init  = function() {
         x = d3.time
               .scale()
-              .domain([ d3.time.day.offset(timeDomain[0], -45), d3.time.day.offset(timeDomain[1], -45) ])
+              .domain([d3.time.day.offset(timeDomain[0],-45),d3.time.day.offset(timeDomain[1],-45)])
               .nice()
-              .range([ 0, config.axisLength ]);
+              .range([0,config.axisLength]);
         xAxisFYQtr = d3.svg
                        .axis()
                        .scale(x)
@@ -1065,8 +1106,19 @@ d3.FYAxisRenderer = function() {
     var xAxisFY = null;
 
     FYAxisRenderer.init  = function() {
-        x = d3.time.scale().domain([ d3.time.month.offset(timeDomain[0], -3), d3.time.month.offset(timeDomain[1], -3) ]).nice().range([ 0, config.axisLength ]);
-        xAxisFY = d3.svg.axis().scale(x).orient("bottom").ticks(d3.time.months, 12).tickSize(0,8,0).tickSubdivide(1).tickFormat(function(x) { return "FY" + x.getFullYear(); });
+        x = d3.time
+              .scale()
+              .domain([ d3.time.month.offset(timeDomain[0], -3), d3.time.month.offset(timeDomain[1], -3) ])
+              .nice()
+              .range([ 0, config.axisLength ]);
+        xAxisFY = d3.svg
+                    .axis()
+                    .scale(x)
+                    .orient("bottom")
+                    .ticks(d3.time.months, 12)
+                    .tickSize(0,8,0)
+                    .tickSubdivide(1)
+                    .tickFormat(function(x){return "FY" + x.getFullYear();});
     };
 
     // Draws Qtr axis hanging on the svg node passed as parameter
@@ -1074,22 +1126,29 @@ d3.FYAxisRenderer = function() {
         node.transition().call(xAxisFY);
         node.selectAll(".tick minor").attr("style", "stroke:" + config.strokeColor);
         node.selectAll("text").attr("style", "fill:" + config.strokeColor + "; text-anchor: middle;");
-        if (config.rotateLabels)
-            node.selectAll("text").style("text-anchor", "end").attr("dx", "-.8em").attr("dy", ".15em").attr("transform", "rotate(-45)" );
+        if (config.rotateLabels) {
+            node.selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", "rotate(-45)" );
+        }
         node.selectAll("line").attr("style", "stroke:" + config.strokeColor);
         node.selectAll(".domain").attr("style", "stroke:" + config.strokeColor);
     };
 
     FYAxisRenderer.domain = function(value) {
-        if (!arguments.length)
+        if (!arguments.length) {
             return timeDomain;
+        }
         timeDomain = value;
         return FYAxisRenderer;
     };
 
     FYAxisRenderer.config = function(value) {
-        if (!arguments.length)
+        if (!arguments.length) {
             return config;
+        }
         // copy values in config object
         for (var k in config) config[k]=value[k];
         return FYAxisRenderer;
@@ -1107,33 +1166,31 @@ d3.FYAxisRenderer = function() {
 };
 
 d3.categoryAxisRenderer = function() {
-    var overlappingResolver;
-    var scale = 1;
-    var categories = [];
     // Each position stores an array with two items, tasksBand_height and milestonesBand_height
-    var categoriesRanges = {};
-    var calculatedLength = 0;
-
-    var config = {
-        "axisLength": null,
-        "barHeight" : 15,
-        "progressBarPorcHeight" : 100,
-        "barPadding" : 10,
-        "barMargin" : 10,
-        "minTaskBandHeight": 30,
-        "mileStoneHeight" : 15,
-        "strokeColor" : "black",
-        "yAxisTitle": "",
-        "hideTitle": false,
-        "catLabelHgtFactor": 2
-    };
+    var overlappingResolver,
+        scale = 1,
+        categories = [],
+        categoriesRanges = {},
+        calculatedLength = 0,
+        config = {
+            "axisLength": null,
+            "barHeight" : 15,
+            "progressBarPorcHeight" : 100,
+            "barPadding" : 10,
+            "barMargin" : 10,
+            "minTaskBandHeight": 30,
+            "mileStoneHeight" : 15,
+            "strokeColor" : "black",
+            "yAxisTitle": "",
+            "hideTitle": false,
+            "catLabelHgtFactor": 2
+        };
 
     // Calculates categories ranges
     categoryAxisRenderer.init  = function() {
-        var ini = 0;
-        var end = 0;
-
-        var category;
+        var ini = 0,
+            end = 0,
+            category;
         for (var c=0; c < categories.length; c++) {
             category = categories[c];
             var taskBandH = calculateTaskBandHeight(category);
@@ -1147,8 +1204,7 @@ d3.categoryAxisRenderer = function() {
     };
 
     categoryAxisRenderer.ticks = function() {
-        var category, range;
-        var ticks = [];
+        var category, range, ticks = [];
         for (var c= 0; c < categories.length; c++) {
             category = categories[c];
             range = getCategoryRange(category);
@@ -1196,7 +1252,11 @@ d3.categoryAxisRenderer = function() {
                     lineHeight = 1.1,
                     y = -10,
                     dy = 0.05;
-                tspan = text.text(null).append("tspan").attr("x", -5).attr("y", y).attr("dy", dy + "em");
+                tspan = text.text(null)
+                            .append("tspan")
+                            .attr("x", -5)
+                            .attr("y", y)
+                            .attr("dy", dy + "em");
                 while (word = words.pop()) {
                     line.push(word);
                     tspan.text(line.join(" "));
@@ -1204,7 +1264,11 @@ d3.categoryAxisRenderer = function() {
                         line.pop();
                         tspan.text(line.join(" "));
                         line = [word];
-                        tspan = text.append("tspan").attr("x", -5).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                        tspan = text.append("tspan")
+                                    .attr("x", -5)
+                                    .attr("y", y)
+                                    .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                                    .text(word);
                     }
                 }
             });
@@ -1230,11 +1294,15 @@ d3.categoryAxisRenderer = function() {
             .style("fill", config.strokeColor)
             .style("dominant-baseline", "auto")
             .style("text-anchor", "end")
-            .text(function(d) { return d;}).call(wrap, 100).style("alignment-middle", "text-before-edge");
+            .text(function(d) { return d;})
+            .call(wrap, 100)
+            .style("alignment-middle", "text-before-edge");
 
         // remove previous tips and draw a line for each tip
         node.selectAll("line.tickY").remove();
-        node.selectAll("line.tickY").data(categoryAxisRenderer.ticks()).enter()
+        node.selectAll("line.tickY")
+            .data(categoryAxisRenderer.ticks())
+            .enter()
             .append("line")
             .attr("class", "tickY")
             .attr("x1","0")
@@ -1272,60 +1340,57 @@ d3.categoryAxisRenderer = function() {
     var catnodeTranslation = function(d) {
         var range = getCategoryRange(d);
         var ypos = range[0] + (range[1]-range[0])/config.catLabelHgtFactor;
-
         return "translate(0," + scaleValue(ypos)+ ")";
     };
 
     var scaleValue = function(value) {
         var proportion = 1;
         if (config.axisLength != null && calculatedLength >0) {
-            proportion = config.axisLength  /calculatedLength;
+            proportion = config.axisLength/calculatedLength;
         }
         return value * proportion;
     };
 
     var getCategoryRange  = function(category) {
-        var init = categoriesRanges[category].taskIni;
-        var end = categoriesRanges[category].mStoneEnd;
-        return [init,end];
+        return [categoriesRanges[category].taskIni,categoriesRanges[category].mStoneEnd];
     };
 
     var getCategoryTasksRange  = function(category) {
-        var init = categoriesRanges[category].taskIni;
-        var end = categoriesRanges[category].taskEnd;
-        return [init,end];
+        return [categoriesRanges[category].taskIni,categoriesRanges[category].taskEnd];
     };
 
     var getCategoryMileStonesRange  = function(category) {
-        var init = categoriesRanges[category].mStoneIni;
-        var end = categoriesRanges[category].mStoneEnd;
-        return [init,end];
+        return [categoriesRanges[category].mStoneIni,categoriesRanges[category].mStoneEnd];
     };
 
     categoryAxisRenderer.overlappingResolver = function(value) {
-        if (!arguments.length)
+        if (!arguments.length) {
             return overlappingResolver;
+        }
         overlappingResolver = value;
         return categoryAxisRenderer;
     };
 
     categoryAxisRenderer.categories = function(value) {
-        if (!arguments.length)
+        if (!arguments.length) {
             return categories;
+        }
         categories = value;
         return categoryAxisRenderer;
     };
 
     categoryAxisRenderer.scale = function(value) {
-        if (!arguments.length)
+        if (!arguments.length) {
             return scale;
+        }
         scale = value;
         return categoryAxisRenderer;
     };
 
     categoryAxisRenderer.config = function(value) {
-        if (!arguments.length)
+        if (!arguments.length) {
             return config;
+        }
         // copy values in config object
         for (var k in config) config[k]=value[k];
         return categoryAxisRenderer;
@@ -1347,12 +1412,12 @@ d3.categoryAxisRenderer = function() {
 };
 
 d3.overlappingResolver = function() {
-    var categories = [];
-    var tasks = [];
-    var range = [0,200];
     /* registers overlaps between tasks. Each item relates task"s
         id with an array containing overlapped tasks id*/
-    var overlaps = {};
+    var categories = [],
+        tasks = [],
+        range = [0,200],
+        overlaps = {};
 
     overlappingResolver.categories = function(value) {
         if (!arguments.length) {
@@ -1377,7 +1442,6 @@ d3.overlappingResolver = function() {
         // get category tasks
         var searchFunctor = function(d) {return (d.category == category);};
         var taskList = tasks.filter(searchFunctor);
-
         var numParallel = 0;
         for (var t=0; t< taskList.length; t++) {
             numParallel = overlappingResolver.taskTotalOverlaps(taskList[t]) + 1;
@@ -1506,47 +1570,44 @@ d3.taskRenderer = function() {
     taskRenderer.draw  = function( node ) {
         var colors = d3.scale.category10().domain(d3.range(0,10));
         node.append("rect")
-        .attr("y", 0)
-        .attr("height", config.barHeight)
-        .attr("width", calculateBarWidth)
-        .attr("class", function(d) {if (hasOwnProperty(d,"class")) return d.class + "-bar"; else return "task-bar";})
-        .attr("fill", function(d) {
-            for (var i = 0; i < categories.length; i++) {
-                if (d.category == categories[i]) {
-                    return d3.rgb(colors(i));
+            .attr("y", 0)
+            .attr("height", config.barHeight)
+            .attr("width", calculateBarWidth)
+            .attr("class", function(d) {if (hasOwnProperty(d,"class")) return d.class + "-bar"; else return "task-bar";})
+            .attr("fill", function(d) {
+                for (var i = 0; i < categories.length; i++) {
+                    if (d.category == categories[i]) {
+                        return d3.rgb(colors(i));
+                    }
                 }
-            }
-        })
-        .on("mouseover", function(d) {
+            })
+            .on("mouseover", function(d) {
+                // Get this bar"s x/y values, then augment for the tooltip
+                var translate = d3.transform(d3.select(this.parentNode).attr("transform")).translate;
+                var xPosition = translate[0];
+                var yPosition = translate[1];
+                var precisionPercent = d3.format(".1f")(d.progress*100);
 
-            // Get this bar"s x/y values, then augment for the tooltip
-            var translate = d3.transform(d3.select(this.parentNode)
-                              .attr("transform"))
-                              .translate;
-            var xPosition = translate[0];
-            var yPosition = translate[1];
-            var precisionPercent = d3.format(".1f")(d.progress*100);
+                // Update the tooltip position and value
+                d3.select("#" + config.tooltipID)
+                    .style("left",xPosition + "px")
+                    .style("top", yPosition + "px")
+                    .select("#value")
+                    .html(d.label+"<br>"+"Start Date: "+d.startDate.toLocaleDateString("en-US")+"<br>" + "End Date: "+d.endDate.toLocaleDateString("en-US")+"<br>" + "Progress: "+ precisionPercent +"%");
 
-            // Update the tooltip position and value
-            d3.select("#" + config.tooltipID)
-                .style("left",xPosition + "px")
-                .style("top", yPosition + "px")
-                .select("#value")
-                .html(d.label+"<br>"+"Start Date: "+d.startDate.toLocaleDateString("en-US")+"<br>" + "End Date: "+d.endDate.toLocaleDateString("en-US")+"<br>" + "Progress: "+ precisionPercent +"%");
-
-            // Show the tooltip
-            d3.select("#" + config.tooltipID).classed("hidden", false);
-        })
-        .on("mouseout", function() {
-            // Hide the tooltip
-            d3.select("#" + config.tooltipID).classed("hidden", true);
-        })
-        .on("mousedown", function (d) {
-            // use the selector API when clicking on a bar
-            getThisForSel.applySelection(d.selection);
-            var event = event || window.event;
-            event.stopPropagation();
-        });
+                // Show the tooltip
+                d3.select("#" + config.tooltipID).classed("hidden", false);
+            })
+            .on("mouseout", function() {
+                // Hide the tooltip
+                d3.select("#" + config.tooltipID).classed("hidden", true);
+            })
+            .on("mousedown", function (d) {
+                // use the selector API when clicking on a bar
+                getThisForSel.applySelection(d.selection);
+                var event = event || window.event;
+                event.stopPropagation();
+            });
 
         // add progress bar"s rect
         node.append("rect")
